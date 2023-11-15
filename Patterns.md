@@ -441,7 +441,7 @@ new DownloadFilesTask().execute(url1, url2, url3)
 
 *Note:* отличается от Фасада тем, что отношения между посредником и коллегами **двухсторонние**
 
-**Memento/Snapshot (Хранитель/Снимок)**
+## Memento/Snapshot (Хранитель/Снимок)
 
 Сохранение и откат состояний, не нарушая инкапсуляции
 
@@ -460,14 +460,41 @@ new DownloadFilesTask().execute(url1, url2, url3)
 
 **Структура:**
 
-1. AbstractSubject - абстракция, хранящая Option<Observer> c методами
- subscribe(Observer) { this.observer = observer; observer.addSubscriber(this) },  
- unsubscribe(Observer) { this.observer = none; observer.removeSubscriber(this) },
- notify() { observer.update() }
+1. Subject - абстракция, ссылающаяся на Observer
 
-2. ConcreteSubject - реализует AbstractSubject и хранит свои состояния и методы
-   
-3. Observer - хранит список подписчиков и обновляет их после дочернего вызова subscriber.notify()
+```Kotlin
+class Subject {
+    val observers: MutableList<Observer>
+
+    fun register(observer: Observer) = observers.add(observer)
+ 
+    fun unregister(observer: Observer) = observers.remove(observer)
+
+    fun notify() { observer.update() }
+}
+```
+
+2. Observer - хранит список подписчиков и обновляет их после вызова subscriber.notify()
+
+```Kotlin
+class Observer {
+    val subscribers: MutableList<Subscriber>
+
+    fun subscribe(subscriber: Subscriber) = subscribers.add(subscriber)
+
+    fun unsubscribe(subscriber: Subscriber) = subscriber.remove(subscriber)
+
+    fun update() = subscribers.forEach(Subscriber::update)
+}
+```
+
+3. Подписчик
+
+```Kotlin
+class Subscriber {
+    fun update(subject: Subject) { ... }
+}
+```
 
 *Пример из реальной жизни:* парадигма реактивного программирования
 
