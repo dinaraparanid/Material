@@ -464,13 +464,13 @@ new DownloadFilesTask().execute(url1, url2, url3)
 
 ```Kotlin
 class Subject {
-    val observers: MutableList<Observer>
+    private val observers: MutableList<Observer>
 
     fun register(observer: Observer) = observers.add(observer)
  
     fun unregister(observer: Observer) = observers.remove(observer)
 
-    fun notify() { observer.update() }
+    fun notify() { observer.update(this) }
 }
 ```
 
@@ -478,13 +478,13 @@ class Subject {
 
 ```Kotlin
 class Observer {
-    val subscribers: MutableList<Subscriber>
+    private val subscribers: MutableList<Subscriber>
 
     fun subscribe(subscriber: Subscriber) = subscribers.add(subscriber)
 
     fun unsubscribe(subscriber: Subscriber) = subscriber.remove(subscriber)
 
-    fun update() = subscribers.forEach(Subscriber::update)
+    fun update(subject: Subject) = subscribers.forEach { it.update(subject) }
 }
 ```
 
