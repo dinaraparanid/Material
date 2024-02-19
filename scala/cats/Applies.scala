@@ -1,3 +1,6 @@
+package com.paranid5
+package catz
+
 import cats.Apply
 import cats.syntax.all._
 
@@ -15,7 +18,7 @@ class Applies extends AnyFunSuite:
     def mapImpl[B](f: A ⇒ B)(implicit executor: ExecutorService): Future[B] =
       executor submit (() ⇒ f(future.get()))
 
-    def flatMapImpl[B](f: A ⇒ Future[B])(implicit executor: ExecutorService): Future[B] =
+    def flatMapImpl[B](f: A ⇒ Future[B]): Future[B] =
       f(future.get())
 
   given Apply[Future] with
