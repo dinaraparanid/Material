@@ -15,11 +15,12 @@ class Applicatives extends AnyFunSuite:
     assert(task.get() == "Я манул Жора!")
 
 object Applicatives:
-  import catz.Applies.executor
+  import Applies.executor
+  import Applies.applyFuture
 
-  given Applicative[Future] with
+  given applicativeFuture: Applicative[Future] with
     override def pure[A](x: A): Future[A] =
       executor submit (() ⇒ x)
 
     override def ap[A, B](ff: Future[A ⇒ B])(fa: Future[A]): Future[B] =
-      Apply[Future].ap(ff)(fa)
+      applyFuture.ap(ff)(fa)
