@@ -1,4 +1,4 @@
-import cats.{Applicative, Monad}
+import cats.Monad
 import cats.syntax.all.*
 
 import org.scalatest.funsuite.AnyFunSuite
@@ -7,8 +7,6 @@ import java.util
 import java.util.concurrent.Future
 
 import scala.annotation.tailrec
-
-case class FutureT[F[_], A](value: F[Future[A]])
 
 class Monads extends AnyFunSuite:
   import Monads.given
