@@ -7,9 +7,7 @@ import scala.annotation.tailrec
 import scala.util.Random
 
 class Functors extends AnyFunSuite:
-  given Functor[Supplier] with
-    override def map[A, B](fa: Supplier[A])(f: A ⇒ B): Supplier[B] =
-      () => f(fa.get())
+  import Functors.given
 
   def fmapTest(using f: Functor[Supplier]): Supplier[String] =
     f.fmap(randomInt)(manulGenerator)
@@ -38,6 +36,11 @@ class Functors extends AnyFunSuite:
 
   test("composeTest"):
     assert(composeTest(value = 3).get() == List("1 манул", "2 манул", "3 манул"))
+
+object Functors:
+  given Functor[Supplier] with
+    override def map[A, B](fa: Supplier[A])(f: A ⇒ B): Supplier[B] =
+      () => f(fa.get())
 
 private def randomInt =
   new Supplier[Int]:
