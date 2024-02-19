@@ -8,30 +8,7 @@ import java.util
 type StringMap[A] = util.Map[String, A]
 
 class Monoids extends AnyFunSuite:
-  given [A : Monoid]: Monoid[StringMap[A]] with
-    override def empty: StringMap[A] =
-      util.Map.of()
-
-    override def combine(x: StringMap[A], y: StringMap[A]): StringMap[A] =
-      val res = util.HashMap[String, A](x)
-
-      y forEach:
-        (key, yv) ⇒
-          Option(x get key) match
-            case Some(xv) ⇒ res.put(key, xv |+| yv)
-            case None     ⇒ res.put(key, yv)
-
-      res
-
-  given MonoidK[StringMap] with
-    override def empty[A]: StringMap[A] =
-      util.Map.of()
-
-    override def combineK[A](x: StringMap[A], y: StringMap[A]): StringMap[A] =
-      val res = util.HashMap[String, A]()
-      res putAll x
-      res putAll y
-      res
+  import Monoids.given
 
   test("monoidTest"):
     assert:
@@ -60,6 +37,32 @@ class Monoids extends AnyFunSuite:
   private def monoidKindTest(): StringMap[Int] =
     val (x, y) = sampleMaps
     x <+> y
+
+object Monoids:
+  given [A: Monoid]: Monoid[StringMap[A]] with
+    override def empty: StringMap[A] =
+      util.Map.of()
+
+    override def combine(x: StringMap[A], y: StringMap[A]): StringMap[A] =
+      val res = util.HashMap[String, A](x)
+
+      y forEach :
+        (key, yv) ⇒
+          Option(x get key) match
+            case Some(xv) ⇒ res.put(key, xv |+| yv)
+            case None     ⇒ res.put(key, yv)
+
+      res
+
+  given MonoidK[StringMap] with
+    override def empty[A]: StringMap[A] =
+      util.Map.of()
+
+    override def combineK[A](x: StringMap[A], y: StringMap[A]): StringMap[A] =
+      val res = util.HashMap[String, A]()
+      res putAll x
+      res putAll y
+      res
 
 private def sampleMaps: (StringMap[Int], StringMap[Int]) =
   val x = util.Map.of(
