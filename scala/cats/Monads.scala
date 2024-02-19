@@ -28,23 +28,23 @@ class Monads extends AnyFunSuite:
     sampleTask flatMap (s ⇒ monad pure s"$s Я ем пельмени!")
 
   test("flatMapTest"):
-    assert(flatMapTest.get() == "Я манул Жора! Я ем пельмени!")
+    assert(flatMapTest.get == "Я манул Жора! Я ем пельмени!")
 
   test("ifFTest"):
     assert:
       Monad[Future].ifM(boolTask(true))(
         ifTrue = sampleTask,
         ifFalse = sampleFalseTask
-      ).get() == "Я манул Жора!"
+      ).get == "Я манул Жора!"
 
     assert:
       Monad[Future].ifM(boolTask(false))(
         ifTrue = sampleTask,
         ifFalse = sampleFalseTask
-      ).get() == "Я манул Васян!"
+      ).get == "Я манул Васян!"
 
 object Monads:
-  import Applicatives.given_Applicative_Future
+  import Applicatives.applicativeFuture
   import Applies.flatMapImpl
 
   given Monad[Future] with
@@ -52,12 +52,12 @@ object Monads:
       fa flatMapImpl f
 
     override def pure[A](x: A): Future[A] =
-      given_Applicative_Future.pure(x)
+      applicativeFuture.pure(x)
 
     override def tailRecM[A, B](a: A)(f: A ⇒ Future[Either[A, B]]): Future[B] =
       @tailrec
       def impl(ab: Future[Either[A, B]] = f(a)): Future[B] =
-        ab.get() match
+        ab.get match
           case Left(value)  ⇒ impl(f(value))
           case Right(value) ⇒ pure(value)
 
