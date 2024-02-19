@@ -1,5 +1,6 @@
 import cats.{Applicative, Monad}
 import cats.syntax.all.*
+
 import org.scalatest.funsuite.AnyFunSuite
 
 import java.util
@@ -32,8 +33,17 @@ class Monads extends AnyFunSuite:
     assert(flatMapTest.get() == "Я манул Жора! Я ем пельмени!")
 
   test("ifFTest"):
-    assert(Monad[Future].ifM(boolTask(true))(sampleTask, sampleFalseTask).get() == "Я манул Жора!")
-    assert(Monad[Future].ifM(boolTask(false))(sampleTask, sampleFalseTask).get() == "Я манул Васян!")
+    assert:
+      Monad[Future].ifM(boolTask(true))(
+        ifTrue = sampleTask,
+        ifFalse = sampleFalseTask
+      ).get() == "Я манул Жора!"
+
+    assert:
+      Monad[Future].ifM(boolTask(false))(
+        ifTrue = sampleTask,
+        ifFalse = sampleFalseTask
+      ).get() == "Я манул Васян!"
 
 object Monads:
   import Applicatives.given_Applicative_Future
