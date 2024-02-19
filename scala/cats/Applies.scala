@@ -1,6 +1,3 @@
-package com.paranid5
-package catz
-
 import cats.Apply
 import cats.syntax.all._
 
@@ -11,22 +8,8 @@ import java.util.concurrent.{ExecutorService, Executors, Future}
 private val MANULS: Int = 10_000_000
 
 class Applies extends AnyFunSuite:
-  implicit val executor: ExecutorService =
-    Executors.newCachedThreadPool()
-
-  extension [A] (future: Future[A])
-    def mapImpl[B](f: A ⇒ B)(implicit executor: ExecutorService): Future[B] =
-      executor submit (() ⇒ f(future.get()))
-
-    def flatMapImpl[B](f: A ⇒ Future[B]): Future[B] =
-      f(future.get())
-
-  given Apply[Future] with
-    override def ap[A, B](ff: Future[A ⇒ B])(fa: Future[A]): Future[B] =
-      fa.flatMapImpl(a ⇒ ff.mapImpl(f ⇒ f(a)))
-
-    override def map[A, B](fa: Future[A])(f: A ⇒ B): Future[B] =
-      fa mapImpl f
+  import catz.Applies.given
+  import catz.Applies.executor
 
   private def millionGenTask: Future[List[Int]] =
     executor submit { () ⇒ List.iterate(1, MANULS)(_ + 1) }
@@ -98,6 +81,24 @@ class Applies extends AnyFunSuite:
 
   test("composeTest"):
     assert(composeTest.get() == manulsAnswer)
+
+object Applies:
+  implicit val executor: ExecutorService =
+    Executors.newCachedThreadPool()
+
+  extension [A](future: Future[A])
+    private def mapImpl[B](f: A ⇒ B): Future[B] =
+      executor submit (() ⇒ f(future.get()))
+
+    private def flatMapImpl[B](f: A ⇒ Future[B]): Future[B] =
+      f(future.get())
+
+  given Apply[Future] with
+    override def ap[A, B](ff: Future[A ⇒ B])(fa: Future[A]): Future[B] =
+      fa.flatMapImpl(a ⇒ ff.mapImpl(f ⇒ f(a)))
+
+    override def map[A, B](fa: Future[A])(f: A ⇒ B): Future[B] =
+      fa mapImpl f
 
 private def manulGenerator(value: Int): String =
   s"$value манул"
