@@ -9,7 +9,7 @@ class Applicatives extends AnyFunSuite:
 
   test("pureTest"):
     val task = Applicative[Future] pure:
-      Thread.sleep(1000)
+      Thread sleep 1000
       "Я манул Жора!"
 
     assert(task.get() == "Я манул Жора!")
