@@ -1,4 +1,5 @@
 import cats.Functor
+
 import org.scalatest.funsuite.AnyFunSuite
 
 import java.util.function.Supplier
@@ -40,26 +41,26 @@ class Functors extends AnyFunSuite:
       )
 
   test("fmapTest"):
-    assert (fmapTest.get() matches "\\d манул")
+    assert(fmapTest.get matches "\\d манул")
 
   test("fproductTest"):
-    val (x, y) = fproductTest.get()
+    val (x, y) = fproductTest.get
     assert(x + y == 1F)
 
   test("liftTest"):
-    assert(liftTest(value = -1).get().isEmpty)
-    assert(liftTest(value = 5).get() == Option(120))
+    assert(liftTest(value = -1).get.isEmpty)
+    assert(liftTest(value = 5).get == Option(120))
 
   test("composeTest"):
-    assert(composeTest(value = 3).get() == List("1 манул", "2 манул", "3 манул"))
+    assert(composeTest(value = 3).get == List("1 манул", "2 манул", "3 манул"))
 
   test("ifFTest"):
-    assert(ifFTest.get() == ifFAnswer)
+    assert(ifFTest.get == ifFAnswer)
 
 object Functors:
   given Functor[Supplier] with
     override def map[A, B](fa: Supplier[A])(f: A ⇒ B): Supplier[B] =
-      () => f(fa.get())
+      () => f(fa.get)
 
 private def randomInt =
   new Supplier[Int]:
