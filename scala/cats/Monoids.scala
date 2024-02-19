@@ -12,7 +12,7 @@ class Monoids extends AnyFunSuite:
 
   test("monoidTest"):
     assert:
-      monoidTest() == util.Map.of(
+      monoidTest == util.Map.of(
         "a", 5,
         "b", 7,
         "c", 9,
@@ -22,7 +22,7 @@ class Monoids extends AnyFunSuite:
 
   test("monoidKindTest"):
     assert:
-      monoidKindTest() == util.Map.of(
+      monoidKindTest == util.Map.of(
         "a", 4,
         "b", 5,
         "c", 6,
@@ -30,23 +30,23 @@ class Monoids extends AnyFunSuite:
         "e", 20
       )
 
-  private def monoidTest(): StringMap[Int] =
+  private def monoidTest: StringMap[Int] =
     val (x, y) = sampleMaps
     x |+| y
 
-  private def monoidKindTest(): StringMap[Int] =
+  private def monoidKindTest: StringMap[Int] =
     val (x, y) = sampleMaps
     x <+> y
 
 object Monoids:
-  given [A: Monoid]: Monoid[StringMap[A]] with
+  given [A : Monoid]: Monoid[StringMap[A]] with
     override def empty: StringMap[A] =
-      util.Map.of()
+      util.Map.of
 
     override def combine(x: StringMap[A], y: StringMap[A]): StringMap[A] =
       val res = util.HashMap[String, A](x)
 
-      y forEach :
+      y forEach:
         (key, yv) ⇒
           Option(x get key) match
             case Some(xv) ⇒ res.put(key, xv |+| yv)
@@ -56,13 +56,35 @@ object Monoids:
 
   given MonoidK[StringMap] with
     override def empty[A]: StringMap[A] =
-      util.Map.of()
+      util.Map.of
 
     override def combineK[A](x: StringMap[A], y: StringMap[A]): StringMap[A] =
       val res = util.HashMap[String, A]()
       res putAll x
       res putAll y
       res
+
+  given [A : Monoid]: Monoid[util.Optional[A]] with
+    override def empty: util.Optional[A] =
+      util.Optional.empty
+
+    override def combine(
+      x: util.Optional[A],
+      y: util.Optional[A]
+    ): util.Optional[A] =
+      if x.isEmpty then y
+      else x map (xx ⇒ y map (yy ⇒ xx |+| yy) orElseGet (() ⇒ xx))
+
+  given MonoidK[util.Optional] with
+    override def empty[A]: util.Optional[A] =
+      util.Optional.empty
+
+    override def combineK[A](
+      x: util.Optional[A],
+      y: util.Optional[A]
+    ): util.Optional[A] =
+      if x.isEmpty then y
+      else x map (xx ⇒ y orElse xx)
 
 private def sampleMaps: (StringMap[Int], StringMap[Int]) =
   val x = util.Map.of(
