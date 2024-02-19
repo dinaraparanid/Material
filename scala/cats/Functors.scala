@@ -23,6 +23,22 @@ class Functors extends AnyFunSuite:
     val repeater = f.fmap(requiredInt(value))(iota)
     fun.map(repeater)(manulGenerator)
 
+  def ifFAnswer: List[String] =
+    List(
+      "Я манул Жора!",
+      "Я манул Васян!",
+      "Я манул Жора!",
+      "Я манул Жора!",
+      "Я манул Васян!",
+    )
+
+  def ifFTest: Supplier[List[String]] =
+    (Functor[Supplier] compose Functor[List])
+      .ifF(trueFalseSup)(
+        ifTrue = "Я манул Жора!",
+        ifFalse = "Я манул Васян!"
+      )
+
   test("fmapTest"):
     assert (fmapTest.get() matches "\\d манул")
 
@@ -36,6 +52,9 @@ class Functors extends AnyFunSuite:
 
   test("composeTest"):
     assert(composeTest(value = 3).get() == List("1 манул", "2 манул", "3 манул"))
+
+  test("ifFTest"):
+    assert(ifFTest.get() == ifFAnswer)
 
 object Functors:
   given Functor[Supplier] with
@@ -51,9 +70,15 @@ private def requiredInt(int: Int) =
   new Supplier[Int]:
     override def get(): Int = int
 
-private def randomProb = new Supplier[Float]:
-  override def get(): Float =
-    Random().between(0, 1)
+private def randomProb =
+  new Supplier[Float]:
+    override def get(): Float =
+      Random().between(0, 1)
+
+private def trueFalseSup =
+  new Supplier[List[Boolean]]:
+    override def get(): List[Boolean] =
+      trueFalseList
 
 private def factorial(value: Int): Option[Int] =
   @tailrec
@@ -67,3 +92,6 @@ private def manulGenerator(value: Int): String =
 
 private def iota(value: Int): List[Int] =
   List.iterate(1, value)(_ + 1)
+
+private def trueFalseList: List[Boolean] =
+  List(true, false, true, true, false)
