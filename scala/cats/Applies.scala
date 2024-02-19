@@ -87,10 +87,10 @@ object Applies:
     Executors.newCachedThreadPool()
 
   extension [A](future: Future[A])
-    private def mapImpl[B](f: A ⇒ B): Future[B] =
+    def mapImpl[B](f: A ⇒ B): Future[B] =
       executor submit (() ⇒ f(future.get()))
 
-    private def flatMapImpl[B](f: A ⇒ Future[B]): Future[B] =
+    def flatMapImpl[B](f: A ⇒ Future[B]): Future[B] =
       f(future.get())
 
   given Apply[Future] with
