@@ -13,16 +13,16 @@ class Traverses extends AnyFunSuite:
   import Traverses.given
 
   def traverseTest: Future[util.List[String]] =
-    util.List.of(1000, 2000, 4000) traverse: ms ⇒
-      applicativeFuture pure:
+    util.List.of(1000, 5000, 10000) traverse: ms ⇒
+      applicativeFuture.map(applicativeFuture pure ()): _ ⇒
         Thread sleep ms
         s"Hello after $ms ms"
 
   def sequenceTest: Future[util.List[String]] =
     util.List
-      .of(1000, 2000, 4000)
+      .of(1000, 5000, 10000)
       .map: ms ⇒
-        applicativeFuture pure:
+        applicativeFuture.map(applicativeFuture pure ()): _ ⇒
           Thread sleep ms
           s"Hello after $ms ms"
       .sequence
@@ -30,8 +30,8 @@ class Traverses extends AnyFunSuite:
   def traverseAnswer: util.List[String] =
     util.List.of(
       "Hello after 1000 ms",
-      "Hello after 2000 ms",
-      "Hello after 4000 ms",
+      "Hello after 5000 ms",
+      "Hello after 10000 ms",
     )
 
   test("traverse_sequence_Test"):
