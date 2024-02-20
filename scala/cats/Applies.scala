@@ -93,9 +93,9 @@ object Applies:
     def flatMapImpl[B](f: A ⇒ Future[B]): Future[B] =
       f(future.get())
 
-  given Apply[Future] with
+  given applyFuture: Apply[Future] with
     override def ap[A, B](ff: Future[A ⇒ B])(fa: Future[A]): Future[B] =
-      fa.flatMapImpl(a ⇒ ff.mapImpl(f ⇒ f(a)))
+      fa flatMapImpl (a ⇒ ff.mapImpl(f ⇒ f(a)))
 
     override def map[A, B](fa: Future[A])(f: A ⇒ B): Future[B] =
       fa mapImpl f
