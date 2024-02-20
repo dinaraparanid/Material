@@ -1,3 +1,6 @@
+package com.paranid5
+package catz
+
 import cats.Monad
 import cats.syntax.all.*
 
@@ -47,7 +50,7 @@ object Monads:
   import Applicatives.applicativeFuture
   import Applies.flatMapImpl
 
-  given Monad[Future] with
+  given monadFuture: Monad[Future] with
     override def flatMap[A, B](fa: Future[A])(f: A ⇒ Future[B]): Future[B] =
       fa flatMapImpl f
 
