@@ -40,15 +40,13 @@ class Traverses extends AnyFunSuite:
 
 object Traverses:
   import Foldables.listFoldable
+  import Monoids.given
 
   given Traverse[util.List] with
     override def traverse[G[_] : Applicative, A, B](fa: util.List[A])(f: A ⇒ G[B]): G[util.List[B]] =
       if fa.isEmpty then Applicative[G] pure util.List.of
       else (f(fa.get(0)) product traverse(fa.subList(1, fa.size))(f)) map:
-        case (elem, list) ⇒
-          new util.ArrayList[B](list.size):
-            add(elem)
-            addAll(list)
+        case (elem, list) ⇒ util.List.of(elem) <+> list
 
     override def foldLeft[A, B](fa: util.List[A], b: B)(f: (B, A) ⇒ B): B =
       listFoldable.foldLeft(fa, b)(f)
