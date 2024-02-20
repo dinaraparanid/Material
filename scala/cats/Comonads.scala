@@ -7,11 +7,11 @@ import org.scalatest.funsuite.AnyFunSuite
 import java.util.concurrent.Future
 
 class Comonads extends AnyFunSuite:
-  import Applies.executor
+  import Applicatives.applicativeFuture
   import Comonads.given
 
   private def extractTest =
-    executor submit: () ⇒
+    applicativeFuture.map(applicativeFuture pure ()): _ ⇒
       Thread sleep 1000
       "Я манул Васян!"
 
@@ -48,11 +48,11 @@ class Comonads extends AnyFunSuite:
     )
 
   private def coflatMapTest: NonEmptyList[Future[String]] =
-    executor
-      .submit:
-        () ⇒ tasksSample
+    applicativeFuture
+      .pure(tasksSample)
       .coflatMap:
-        _.get map (f ⇒ executor submit (() ⇒ f()))
+        _.get map: f ⇒
+          applicativeFuture.map(applicativeFuture pure ())(_ ⇒ f())
       .get
 
   test("extractTest"):
@@ -63,13 +63,12 @@ class Comonads extends AnyFunSuite:
 
 object Comonads:
   import Applicatives.applicativeFuture
-  import Applies.executor
 
   given Comonad[Future] with
     override def extract[A](x: Future[A]): A = x.get
 
     override def coflatMap[A, B](fa: Future[A])(f: Future[A] ⇒ B): Future[B] =
-      executor submit (() ⇒ f(fa))
+      applicativeFuture.map(applicativeFuture pure ())(_ ⇒ f(fa))
 
     override def map[A, B](fa: Future[A])(f: A ⇒ B): Future[B] =
       applicativeFuture.map(fa)(f)
