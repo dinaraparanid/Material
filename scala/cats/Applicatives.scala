@@ -1,22 +1,21 @@
-import cats.{Applicative, Apply}
+import cats.Applicative
 
 import org.scalatest.funsuite.AnyFunSuite
 
 import java.util.concurrent.Future
 
 class Applicatives extends AnyFunSuite:
-  import Applicatives.given
+  import Applicatives.applicativeFuture
 
   test("pureTest"):
-    val task = Applicative[Future] pure:
+    val task = applicativeFuture pure:
       Thread sleep 1000
       "Я манул Жора!"
 
     assert(task.get() == "Я манул Жора!")
 
 object Applicatives:
-  import Applies.executor
-  import Applies.applyFuture
+  import Applies.{applyFuture, executor}
 
   given applicativeFuture: Applicative[Future] with
     override def pure[A](x: A): Future[A] =
