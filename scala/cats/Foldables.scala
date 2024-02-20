@@ -71,7 +71,7 @@ class Foldables extends AnyFunSuite:
     assert(traverseTest.get == ())
 
 object Foldables:
-  given Foldable[util.List] with
+  given listFoldable: Foldable[util.List] with
     override def foldLeft[A, B](fa: util.List[A], b: B)(f: (B, A) ⇒ B): B =
       @tailrec
       def impl(fs: util.List[A] = fa, res: B = b): B =
