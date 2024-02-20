@@ -64,7 +64,7 @@ class Comonads extends AnyFunSuite:
 object Comonads:
   import Applicatives.applicativeFuture
 
-  given Comonad[Future] with
+  given comonadFuture: Comonad[Future] with
     override def extract[A](x: Future[A]): A = x.get
 
     override def coflatMap[A, B](fa: Future[A])(f: Future[A] ⇒ B): Future[B] =
