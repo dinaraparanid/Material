@@ -86,6 +86,30 @@ object Monoids:
       if x.isEmpty then y
       else x map (xx ⇒ y orElse xx)
 
+  given [A : Monoid]: Monoid[util.List[A]] with
+    override def empty: util.List[A] =
+      util.List.of
+
+    override def combine(
+      x: util.List[A],
+      y: util.List[A]
+    ): util.List[A] =
+      new util.ArrayList[A](x.size + y.size):
+        addAll(x)
+        addAll(y)
+
+  given MonoidK[util.List] with
+    override def empty[A]: util.List[A] =
+      util.List.of
+
+    override def combineK[A](
+      x: util.List[A],
+      y: util.List[A]
+    ): util.List[A] =
+      new util.ArrayList[A](x.size + y.size):
+        addAll(x)
+        addAll(y)
+
 private def sampleMaps: (StringMap[Int], StringMap[Int]) =
   val x = util.Map.of(
     "a", 1,
